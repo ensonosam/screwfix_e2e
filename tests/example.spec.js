@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByText('Powered by FusionX')).toBeVisible()
 });
 
-test('Buy item using card', async ({ page }) => {
+test('Buy item using existing card', async ({ page }) => {
   await page.getByLabel('Your Account').click();
   await page.getByTestId('email').fill(email);
   await page.getByTestId('password').fill(password);
@@ -43,6 +43,14 @@ test('Buy item using card', async ({ page }) => {
   await page.getByRole('button', { name: 'Place order and pay' }).click();
   
   await expect(page.getByRole('heading', { name: 'Order Received' })).toBeVisible({ timeout: 30000 });
+
+  let orderNumberInnerText = await page.getByText('Order Number').allTextContents();
+  let orderNumber = orderNumberInnerText[0].slice(14);
+  console.log(`Order Number: ${orderNumber}`);
+  await page.getByRole('link', { name: 'Continue Shopping' }).first().click();
+  await page.getByRole('link', { name: 'Your Account' }).click();
+  await page.getByRole('link', { name: 'Order History' }).click();
+  await expect(page.getByText(`Order Placed: ${orderNumber}`)).toBeVisible();
 });
 
 test('Create an account', async ({ page }) => {
